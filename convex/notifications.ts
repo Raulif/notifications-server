@@ -1,5 +1,5 @@
-import { query, mutation } from './_generated/server.js';
-import { v } from 'convex/values';
+import { mutation, query } from "./_generated/server.js";
+import { v } from "convex/values";
 
 export const post = mutation({
   args: {
@@ -7,7 +7,7 @@ export const post = mutation({
     endpoint: v.string(),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert('notifications', {
+    return await ctx.db.insert("notifications", {
       user: args.user,
       enpoint: args.endpoint,
     });
@@ -17,14 +17,14 @@ export const post = mutation({
 export const get = query({
   args: {},
   handler: async (ctx) => {
-    const response = await ctx.db.query('notifications').collect();
+    const response = await ctx.db.query("notifications").collect();
     return response[0];
   },
 });
 
 export const put = mutation({
   args: {
-    id: v.id('notifications'),
+    id: v.id("notifications"),
     endpoint: v.string(),
   },
   handler: async (ctx, args) => {
