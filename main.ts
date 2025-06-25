@@ -13,7 +13,7 @@ const convex = new ConvexClient(convexUrl);
 type User = {
   user: string;
   endpoint: string;
-  id: Id<'notifications'>;
+  _id: Id<'notifications'>;
 };
 
 const app = new Application();
@@ -42,10 +42,11 @@ router.post('/new-subscription', async (ctx) => {
       console.log(storedUsers);
       const currentUser = storedUsers?.find((u) => u.user === user);
       console.log('Current user');
+      console.log(currentUser)
       if (currentUser) {
         // If user exist, update user endpoint in DB
         await convex.mutation(api.notifications.put, {
-          id: currentUser.id,
+          id: currentUser._id,
           endpoint: currentUser.endpoint,
         });
       } else {
