@@ -24,11 +24,11 @@ export const get = query({
 
 export const put = mutation({
   args: {
-    id: v.id("notifications"),
+    _id: v.id("notifications"),
     endpoint: v.string(),
   },
   handler: async (ctx, args) => {
-    const { id, endpoint } = args;
-    return await ctx.db.patch(id, { endpoint });
+    const { _id, endpoint } = args;
+    return await ctx.db.patch(_id, { endpoint });
   },
 });
