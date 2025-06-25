@@ -35,10 +35,9 @@ router.post('/new-subscription', async (ctx) => {
       ctx.response.body = { ok: false };
     } else {
       // Get existing users
-      const storedUsers = (await convex.query(
-        api.notifications.get,
-        {}
-      )) as Array<User>;
+      const storedUsers = ((await convex.query(api.notifications.get, {})) ||
+        []) as Array<User>;
+
       console.log('Stored users:');
       console.log(storedUsers);
       const currentUser = storedUsers?.find((u) => u.user === user);
