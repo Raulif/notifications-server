@@ -18,9 +18,7 @@ export const get = query({
   args: {},
   handler: async (ctx) => {
     const response = await ctx.db.query("notifications").collect();
-    console.log('Response from Convex')
-    console.log(response)
-    return response[0];
+    return response;
   },
 });
 
