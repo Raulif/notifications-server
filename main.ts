@@ -18,9 +18,9 @@ type User = {
 
 const app = new Application();
 app.use((ctx, next) => {
-  ctx.response.headers.set('Access-Control-Allow-Origin', '*')
-  return next()
-})
+  ctx.response.headers.set('Access-Control-Allow-Origin', '*');
+  return next();
+});
 
 const router = new Router();
 router.post('/new-subscription', async (ctx) => {
@@ -39,8 +39,10 @@ router.post('/new-subscription', async (ctx) => {
         api.notifications.get,
         {}
       )) as Array<User>;
+      console.log('Stored users:');
+      console.log(storedUsers);
       const currentUser = storedUsers?.find((u) => u.user === user);
-
+      console.log('Current user');
       if (currentUser) {
         // If user exist, update user endpoint in DB
         await convex.mutation(api.notifications.put, {
@@ -58,8 +60,9 @@ router.post('/new-subscription', async (ctx) => {
       ctx.response.status = 200;
       ctx.response.body = { ok: true };
     }
-  } catch (_e) {
+  } catch (e) {
     // Respond with error
+    console.error(e);
     ctx.response.status = 500;
     ctx.response.body = { ok: false };
   }
