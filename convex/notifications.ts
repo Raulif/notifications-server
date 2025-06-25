@@ -9,7 +9,7 @@ export const post = mutation({
   handler: async (ctx, args) => {
     return await ctx.db.insert("notifications", {
       user: args.user,
-      enpoint: args.endpoint,
+      endpoint: args.endpoint,
     });
   },
 });
@@ -24,13 +24,11 @@ export const get = query({
 
 export const put = mutation({
   args: {
-    _id: v.id("notifications"),
+    id: v.id("notifications"),
     endpoint: v.string(),
   },
   handler: async (ctx, args) => {
-    const { _id, endpoint } = args;
-    console.log('Args in Put')
-    console.log(args)
-    return await ctx.db.patch(_id, { endpoint });
+    const { id, endpoint } = args;
+    return await ctx.db.patch(id, { endpoint });
   },
 });
