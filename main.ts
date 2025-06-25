@@ -9,7 +9,6 @@ import { Id } from './convex/_generated/dataModel.d.ts';
 const convexUrl = Deno.env.get('CONVEX_URL') as string;
 const publicVapidKey = Deno.env.get('PUBLIC_VAPID_KEY') as string;
 const convex = new ConvexClient(convexUrl);
-const router = new Router();
 
 type User = {
   user: string;
@@ -17,6 +16,13 @@ type User = {
   id: Id<'notifications'>;
 };
 
+const app = new Application();
+app.use((ctx, next) => {
+  ctx.response.headers.set('Access-Control-Allow-Origin', '*')
+  return next()
+})
+
+const router = new Router();
 router.post('/new-subscription', async (ctx) => {
   try {
     const body = await ctx.request.body.json();
@@ -64,7 +70,6 @@ router.get('/public-vapid-key', (ctx) => {
   ctx.response.body = { publicVapidKey, ok: true };
 });
 
-const app = new Application();
 app.use(router.routes());
 app.use(router.allowedMethods());
 await app.listen({ port: 8080 });
