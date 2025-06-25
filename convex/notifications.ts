@@ -29,6 +29,8 @@ export const put = mutation({
   },
   handler: async (ctx, args) => {
     const { _id, endpoint } = args;
+    console.log('Args in Put')
+    console.log(args)
     return await ctx.db.patch(_id, { endpoint });
   },
 });
