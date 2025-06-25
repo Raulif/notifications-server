@@ -10,9 +10,18 @@ const convexUrl = Deno.env.get('CONVEX_URL') as string;
 const publicVapidKey = Deno.env.get('PUBLIC_VAPID_KEY') as string;
 const convex = new ConvexClient(convexUrl);
 
+type PushSubscription = {
+  endpoint: string;
+  expirationTime: number | null;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+};
+
 type User = {
   user: string;
-  endpoint: string;
+  subscription: PushSubscription;
   _id: Id<'notifications'>;
 };
 
@@ -26,31 +35,32 @@ const router = new Router();
 router.post('/new-subscription', async (ctx) => {
   try {
     const body = await ctx.request.body.json();
+    const subscription: PushSubscription = body.subscription;
+    const user: string = body.user;
 
-    const { subscription, user } = body;
     // If user data is not provided, respond with not OK
     if (!subscription?.endpoint || !user) {
       ctx.response.status = 418;
       ctx.response.body = { ok: false };
-    } else {
-      console.log('subscription')
-      console.log(subscription)
+    // } else {
+    //   console.log('subscription');
+    //   console.log(subscription);
       // Get existing users
       const storedUsers = ((await convex.query(api.notifications.get, {})) ||
         []) as Array<User>;
 
       const currentUser = storedUsers?.find((u) => u.user === user);
       if (currentUser) {
-        // If user exist, update user endpoint in DB
+        // If user exist, update user subscription in DB
         await convex.mutation(api.notifications.put, {
           id: currentUser._id,
-          endpoint: currentUser.endpoint,
+          subscription,
         });
       } else {
         // If user does not exist, store new in DB
         await convex.mutation(api.notifications.post, {
           user,
-          endpoint: subscription.endpoint,
+          subscription,
         });
       }
       // Respond with OK
