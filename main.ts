@@ -29,7 +29,9 @@ router.post('/new-subscription', async (ctx) => {
     const body = await ctx.request.body.json();
     const subscription: PushSubscription = body.subscription;
     const user: string = body.user;
-
+    console.log('USER: ', user)
+    console.log('USER SUBSCRIPTION:')
+    console.log(subscription)
     // If user data is not provided, respond with not OK
     if (!subscription?.endpoint || !user) {
       ctx.response.status = 418;
