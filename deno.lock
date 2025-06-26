@@ -11,7 +11,6 @@
     "jsr:@std/http@1": "1.0.18",
     "jsr:@std/media-types@1": "1.1.0",
     "jsr:@std/path@1": "1.1.0",
-    "npm:@biomejs/biome@2.0.5": "2.0.5",
     "npm:@types/node@*": "22.15.15",
     "npm:@types/typescript@*": "2.0.0",
     "npm:convex@*": "1.24.8",
@@ -69,20 +68,6 @@
     }
   },
   "npm": {
-    "@biomejs/biome@2.0.5": {
-      "integrity": "sha512-MztFGhE6cVjf3QmomWu83GpTFyWY8KIcskgRf2AqVEMSH4qI4rNdBLdpAQ11TNK9pUfLGz3IIOC1ZYwgBePtig==",
-      "optionalDependencies": [
-        "@biomejs/cli-darwin-arm64",
-        "@biomejs/cli-darwin-x64",
-        "@biomejs/cli-linux-arm64",
-        "@biomejs/cli-linux-arm64-musl",
-        "@biomejs/cli-linux-x64",
-        "@biomejs/cli-linux-x64-musl",
-        "@biomejs/cli-win32-arm64",
-        "@biomejs/cli-win32-x64"
-      ],
-      "bin": true
-    },
     "@biomejs/cli-darwin-arm64@2.0.5": {
       "integrity": "sha512-VIIWQv9Rcj9XresjCf3isBFfWjFStsdGZvm8SmwJzKs/22YQj167ge7DkxuaaZbNf2kmYif0AcjAKvtNedEoEw==",
       "os": ["darwin"],
@@ -407,7 +392,6 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@biomejs/biome@2.0.5",
         "npm:convex@^1.24.8"
       ]
     }
