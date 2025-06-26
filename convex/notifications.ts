@@ -3,7 +3,7 @@ import { v } from "convex/values";
 
 const Subscription = v.object({
 	endpoint: v.string(),
-	expirationTime: v.optional(v.string()),
+	expirationTime: v.union(v.string(), v.null()),
 	keys: v.object({
 		p256dh: v.string(),
 		auth: v.string(),
