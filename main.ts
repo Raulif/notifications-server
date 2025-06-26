@@ -8,6 +8,7 @@ import {
   sendDeleteNameNotification,
   sendNewNameNotification,
   sendRateNotification,
+  sendUnvetoNotification,
   sendVetoNotification,
 } from './send-notification.ts';
 import type { NotificationEvent, PushSubscription, User } from './types.d.ts';
@@ -111,6 +112,11 @@ router.post('/send-notification', async (ctx) => {
       break;
     case 'veto':
       sendVetoNotification(name, subscription, user);
+      ctx.response.body = { ok: true };
+      ctx.response.status = 200;
+      break;
+    case 'unveto':
+      sendUnvetoNotification(name, subscription, user);
       ctx.response.body = { ok: true };
       ctx.response.status = 200;
       break;

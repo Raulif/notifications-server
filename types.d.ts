@@ -15,4 +15,4 @@ export type User = {
 	_id: Id<"notifications">;
 };
 
-export type NotificationEvent = "new" | "veto" | "rate" | "delete";
+export type NotificationEvent = "new" | "veto" | "rate" | "delete" | "unveto";
