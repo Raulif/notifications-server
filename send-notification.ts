@@ -8,12 +8,15 @@ const serverUrl = Deno.env.get('SERVER_URL') as string;
 
 webpush.setVapidDetails(serverUrl, publicVapidKey, privateVapidKey);
 
+const capitalize = (text: string) =>
+  text.charAt(0).toUpperCase() + text.substring(1);
+
 export const sendNewNameNotification = (
   name: string,
   subscription: PushSubscription,
   issuer: string
 ) => {
-  const notification = `${issuer} hat ${name.toUpperCase()} hinzugefügt.`;
+  const notification = `${capitalize(issuer)} hat ${name.toUpperCase()} hinzugefügt.`;
   webpush.sendNotification(subscription, notification);
 };
 
@@ -22,7 +25,7 @@ export const sendDeleteNameNotification = (
   subscription: PushSubscription,
   issuer: string
 ) => {
-  const notification = `${issuer} hat ${name.toUpperCase()} gelöscht.`;
+  const notification = `${capitalize(issuer)} hat ${name.toUpperCase()} gelöscht.`;
   webpush.sendNotification(subscription, notification);
 };
 
@@ -32,7 +35,7 @@ export const sendRateNotification = (
   issuer: string,
   rate: string
 ) => {
-  const notification = `${issuer} hat ${name.toUpperCase()} mit ${rate}% bewertet.`;
+  const notification = `${capitalize(issuer)} hat ${name.toUpperCase()} mit ${rate}% bewertet.`;
   webpush.sendNotification(subscription, notification);
 };
 
@@ -41,7 +44,7 @@ export const sendVetoNotification = (
   subscription: PushSubscription,
   issuer: string
 ) => {
-  const notification = `${issuer} hat ein Veto gegen ${name.toUpperCase()} eingelegt.`;
+  const notification = `${capitalize(issuer)} hat ein Veto gegen ${name.toUpperCase()} eingelegt.`;
   webpush.sendNotification(subscription, notification);
 };
 
@@ -50,6 +53,6 @@ export const sendUnvetoNotification = (
   subscription: PushSubscription,
   issuer: string
 ) => {
-  const notification = `${issuer} hat das Veto gegen ${name.toUpperCase()} zurückgezogen.`;
+  const notification = `${capitalize(issuer)} hat das Veto gegen ${name.toUpperCase()} zurückgezogen.`;
   webpush.sendNotification(subscription, notification);
 };
