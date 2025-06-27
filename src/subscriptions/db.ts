@@ -1,5 +1,5 @@
 import { ConvexClient } from 'npm:convex/browser';
-import { api } from '../../convex/_generated/api.d.ts';
+import { api } from '../../convex/_generated/api.js';
 import { Subscription } from '../../types.d.ts';
 
 const convexUrl = Deno.env.get('CONVEX_URL') as string;
