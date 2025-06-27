@@ -11,7 +11,13 @@ import {
   sendUnvetoNotification,
   sendVetoNotification,
 } from './send-notification.ts';
-import type { NotificationEvent, PushSubscription, User } from './types.d.ts';
+import type {
+  NotificationEvent,
+  PushSubscription,
+  Subscription,
+} from './types.d.ts';
+import { getUserSubscription } from './src/subscriptions/db.ts';
+import { handleNewNameNotification } from './src/notifications/new-name.ts';
 
 const convexUrl = Deno.env.get('CONVEX_URL') as string;
 const publicVapidKey = Deno.env.get('PUBLIC_VAPID_KEY') as string;
@@ -29,30 +35,22 @@ router.post('/new-subscription', async (ctx) => {
     const body = await ctx.request.body.json();
     const subscription: PushSubscription = body.subscription;
     const user: string = body.user;
-    console.log('USER: ', user)
-    console.log('USER SUBSCRIPTION:')
-    console.log(subscription)
     // If user data is not provided, respond with not OK
     if (!subscription?.endpoint || !user) {
       ctx.response.status = 418;
       ctx.response.body = { ok: false };
     } else {
-      //   console.log('subscription');
-      //   console.log(subscription);
       // Get existing users
-      const storedUsers = ((await convex.query(api.notifications.get, {})) ||
-        []) as Array<User>;
-
-      const currentUser = storedUsers?.find((u) => u.user === user);
-      if (currentUser) {
+      const userSubscription = await getUserSubscription(user);
+      if (userSubscription) {
         // If user exist, update user subscription in DB
-        await convex.mutation(api.notifications.put, {
-          id: currentUser._id,
+        await convex.mutation(api.subscriptions.updateSubscription, {
+          id: userSubscription._id,
           subscription,
         });
       } else {
         // If user does not exist, store new in DB
-        await convex.mutation(api.notifications.post, {
+        await convex.mutation(api.subscriptions.postSubscription, {
           user,
           subscription,
         });
@@ -87,9 +85,21 @@ router.post('/send-notification', async (ctx) => {
     return;
   }
 
-  const storedUsers = ((await convex.query(api.notifications.get, {})) ||
-    []) as Array<User>;
-  const otherUser = storedUsers.find((us) => us.user !== user);
+  switch (eventType) {
+    case 'new':
+      handleNewNameNotification(name, user);
+      break;
+    default:
+      ctx.response.body = { ok: false };
+      ctx.response.status = 500;
+  }
+
+  const storedSubscriptions = ((await convex.query(
+    api.subscriptions.get,
+    {}
+  )) || []) as Array<Subscription>;
+
+  const otherUser = storedSubscriptions.find((sub) => sub.user !== user);
   if (!otherUser) {
     ctx.response.status = 200;
     ctx.response.body = { ok: true };
