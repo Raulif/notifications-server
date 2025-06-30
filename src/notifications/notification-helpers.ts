@@ -2,7 +2,7 @@ import { ConvexClient } from 'npm:convex/browser';
 import { Notification, NotificationEvent } from '../../types.d.ts';
 import { api } from '../../convex/_generated/api.js';
 import { getStoredSubscriptions } from '../subscriptions/db.ts';
-import { capitalize } from "../helpers.ts";
+import { capitalize, getOtherUserName } from "../helpers.ts";
 
 const convexUrl = Deno.env.get('CONVEX_URL') as string;
 const convex = new ConvexClient(convexUrl);
@@ -28,8 +28,6 @@ const getNotificationText = (
       return '';
   }
 };
-
-const getOtherUserName = (user: string) => (user === 'papa' ? 'mama' : 'papa');
 
 export const storeNotificationInDB = async (
   name: string,

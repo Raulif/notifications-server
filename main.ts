@@ -26,7 +26,6 @@ router.post('/new-subscription', async (ctx) => {
     const body = await ctx.request.body.json();
     const subscription: PushSubscription = body.subscription;
     const user: string = body.user;
-    console.log({ subscription, user });
     // If user data is not provided, respond with not OK
     if (!subscription?.endpoint || !user) {
       ctx.response.status = 418;
@@ -35,14 +34,12 @@ router.post('/new-subscription', async (ctx) => {
       // Get existing users
       const userSubscription = await getOtherUserSubscription(user);
       if (userSubscription) {
-        console.log({ userSubscription });
         // If user exist, update user subscription in DB
         await convex.mutation(api.subscriptions.update, {
           id: userSubscription._id,
           subscription,
         });
       } else {
-        console.log({ subscriptionsss: subscription });
         // If user does not exist, store new in DB
         await convex.mutation(api.subscriptions.post, {
           user,
@@ -79,7 +76,6 @@ router.post('/send-notification', async (ctx) => {
       ctx.response.body = { ok: false };
       return;
     }
-    console.log({ name, user, eventType, rate });
 
     switch (eventType) {
       case 'new':
@@ -141,5 +137,13 @@ router.post('/send-notification', async (ctx) => {
 
 app.use(router.routes());
 app.use(router.allowedMethods());
+
+app.addEventListener("listen", ({ hostname, port, secure }) => {
+  console.log(
+    `Listening on: ${secure ? "https://" : "http://"}${
+      hostname ?? "localhost"
+    }:${port}`,
+  );
+});
+
 await app.listen({ port: 8080 });
-console.log('Listening on port 8080');

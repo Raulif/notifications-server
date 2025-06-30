@@ -11,6 +11,8 @@ const Notification = v.object({
   text: v.string(),
   consumptions: v.array(Consumption),
   eventType: v.string(),
+  _creationTime: v.optional(v.any()),
+  _id: v.optional(v.id('notifications'))
 });
 
 export const post = mutation({

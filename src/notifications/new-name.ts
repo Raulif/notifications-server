@@ -19,10 +19,6 @@ export const handleNewNameNotification = async (
   // If not consumed, send push notification
   if (!isConsumed) {
     const otherUserSubscription = await getOtherUserSubscription(issuer);
-    console.log('SUBSCRIPTION IN HANDLE NEW NAME NOTIFICATOIN');
-    console.log(otherUserSubscription);
-    console.log('STORED NOTIFICATION IN NEW NAME NOTIFICATION');
-    console.log(storedNotification);
     if (!otherUserSubscription) return;
     sendPushNotification(otherUserSubscription?.subscription, storedNotification.text);
   }
