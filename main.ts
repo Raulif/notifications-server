@@ -47,7 +47,7 @@ router.post('/new-subscription', async (ctx) => {
           id: userSubscription._id,
           subscription,
         });
-      } else {
+      } else if (!userSubscription) {
         // If user does not exist, store new in DB
         console.log('Storing new subscription');
         await convex.mutation(api.subscriptions.post, {
