@@ -2,12 +2,10 @@ import { ConvexClient } from 'npm:convex/browser';
 import { Notification, NotificationEvent } from '../../types.d.ts';
 import { api } from '../../convex/_generated/api.js';
 import { getStoredSubscriptions } from '../subscriptions/db.ts';
+import { capitalize } from "../helpers.ts";
 
 const convexUrl = Deno.env.get('CONVEX_URL') as string;
 const convex = new ConvexClient(convexUrl);
-
-const capitalize = (text: string) =>
-  text.charAt(0).toUpperCase() + text.substring(1);
 
 const getNotificationText = (
   name: string,
@@ -97,3 +95,4 @@ export const consumeNotification = async (
     notification: updatedNotification,
   });
 };
+

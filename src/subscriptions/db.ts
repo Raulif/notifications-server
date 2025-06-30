@@ -7,8 +7,10 @@ const convex = new ConvexClient(convexUrl);
 export const getStoredSubscriptions = async (): Promise<Array<Subscription>> =>
   await convex.query(api.subscriptions.get, {});
 
-export const getUserSubscription =  async (user: string):Promise<Subscription|undefined> => {
-  const subscriptions = await getStoredSubscriptions()
-  const userSubscription =  subscriptions?.find((u) => u.user === user);
-  return userSubscription
-}
+export const getOtherUserSubscription = async (
+  user: string
+): Promise<Subscription | undefined> => {
+  const subscriptions = await getStoredSubscriptions();
+  const userSubscription = subscriptions?.find((u) => u.user !== user);
+  return userSubscription;
+};

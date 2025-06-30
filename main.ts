@@ -4,21 +4,12 @@ import { Router } from 'jsr:@oak/oak/router';
 import { ConvexClient } from 'npm:convex/browser';
 import { api } from './convex/_generated/api.js';
 
-import {
-  sendDeleteNameNotification,
-  sendNewNameNotification,
-  sendRateNotification,
-  sendUnvetoNotification,
-  sendVetoNotification,
-} from './send-notification.ts';
-import type {
-  NotificationEvent,
-  PushSubscription,
-  Subscription,
-} from './types.d.ts';
-import { getUserSubscription } from './src/subscriptions/db.ts';
+import type { NotificationEvent, PushSubscription } from './types.d.ts';
+import { getOtherUserSubscription } from './src/subscriptions/db.ts';
 import { handleNewNameNotification } from './src/notifications/new-name.ts';
+import { setUpNotificationServerCredentials } from './src/notifications/webpush-server.ts';
 
+setUpNotificationServerCredentials();
 const convexUrl = Deno.env.get('CONVEX_URL') as string;
 const publicVapidKey = Deno.env.get('PUBLIC_VAPID_KEY') as string;
 const convex = new ConvexClient(convexUrl);
@@ -35,20 +26,23 @@ router.post('/new-subscription', async (ctx) => {
     const body = await ctx.request.body.json();
     const subscription: PushSubscription = body.subscription;
     const user: string = body.user;
+    console.log({ subscription, user });
     // If user data is not provided, respond with not OK
     if (!subscription?.endpoint || !user) {
       ctx.response.status = 418;
       ctx.response.body = { ok: false };
     } else {
       // Get existing users
-      const userSubscription = await getUserSubscription(user);
+      const userSubscription = await getOtherUserSubscription(user);
       if (userSubscription) {
+        console.log({ userSubscription });
         // If user exist, update user subscription in DB
         await convex.mutation(api.subscriptions.update, {
           id: userSubscription._id,
           subscription,
         });
       } else {
+        console.log({ subscriptionsss: subscription });
         // If user does not exist, store new in DB
         await convex.mutation(api.subscriptions.post, {
           user,
@@ -84,11 +78,14 @@ router.post('/send-notification', async (ctx) => {
     ctx.response.body = { ok: false };
     return;
   }
+  console.log({ name, user, eventType, rate });
 
   switch (eventType) {
     case 'new':
       handleNewNameNotification(name, user);
-      break;
+      ctx.response.body = { ok: true };
+      ctx.response.status = 200;
+      return;
     default:
       ctx.response.body = { ok: false };
       ctx.response.status = 500;
