@@ -87,7 +87,7 @@ router.post('/send-notification', async (ctx) => {
       return;
     }
 
-    handleNewNotification(name, user, eventType);
+    handleNewNotification(name, user, eventType, rate);
     ctx.response.body = { ok: true };
     ctx.response.status = 200;
 
