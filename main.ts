@@ -44,13 +44,13 @@ router.post('/new-subscription', async (ctx) => {
       const userSubscription = await getUserSubscription(user);
       if (userSubscription) {
         // If user exist, update user subscription in DB
-        await convex.mutation(api.subscriptions.updateSubscription, {
+        await convex.mutation(api.subscriptions.update, {
           id: userSubscription._id,
           subscription,
         });
       } else {
         // If user does not exist, store new in DB
-        await convex.mutation(api.subscriptions.postSubscription, {
+        await convex.mutation(api.subscriptions.post, {
           user,
           subscription,
         });
@@ -94,48 +94,48 @@ router.post('/send-notification', async (ctx) => {
       ctx.response.status = 500;
   }
 
-  const storedSubscriptions = ((await convex.query(
-    api.subscriptions.get,
-    {}
-  )) || []) as Array<Subscription>;
+  // const storedSubscriptions = ((await convex.query(
+  //   api.subscriptions.get,
+  //   {}
+  // )) || []) as Array<Subscription>;
 
-  const otherUser = storedSubscriptions.find((sub) => sub.user !== user);
-  if (!otherUser) {
-    ctx.response.status = 200;
-    ctx.response.body = { ok: true };
-    return;
-  }
-  const subscription = otherUser.subscription;
-  switch (eventType) {
-    case 'new':
-      sendNewNameNotification(name, subscription, user);
-      ctx.response.body = { ok: true };
-      ctx.response.status = 200;
-      break;
-    case 'delete':
-      sendDeleteNameNotification(name, subscription, user);
-      ctx.response.body = { ok: true };
-      ctx.response.status = 200;
-      break;
-    case 'rate':
-      sendRateNotification(name, subscription, user, rate);
-      ctx.response.body = { ok: true };
-      ctx.response.status = 200;
-      break;
-    case 'veto':
-      sendVetoNotification(name, subscription, user);
-      ctx.response.body = { ok: true };
-      ctx.response.status = 200;
-      break;
-    case 'unveto':
-      sendUnvetoNotification(name, subscription, user);
-      ctx.response.body = { ok: true };
-      ctx.response.status = 200;
-      break;
-    default:
-      ctx.response.body = { ok: false };
-      ctx.response.status = 500;
-  }
+  // const otherUser = storedSubscriptions.find((sub) => sub.user !== user);
+  // if (!otherUser) {
+  //   ctx.response.status = 200;
+  //   ctx.response.body = { ok: true };
+  //   return;
+  // }
+  // const subscription = otherUser.subscription;
+  // switch (eventType) {
+  //   case 'new':
+  //     sendNewNameNotification(name, subscription, user);
+  //     ctx.response.body = { ok: true };
+  //     ctx.response.status = 200;
+  //     break;
+  //   case 'delete':
+  //     sendDeleteNameNotification(name, subscription, user);
+  //     ctx.response.body = { ok: true };
+  //     ctx.response.status = 200;
+  //     break;
+  //   case 'rate':
+  //     sendRateNotification(name, subscription, user, rate);
+  //     ctx.response.body = { ok: true };
+  //     ctx.response.status = 200;
+  //     break;
+  //   case 'veto':
+  //     sendVetoNotification(name, subscription, user);
+  //     ctx.response.body = { ok: true };
+  //     ctx.response.status = 200;
+  //     break;
+  //   case 'unveto':
+  //     sendUnvetoNotification(name, subscription, user);
+  //     ctx.response.body = { ok: true };
+  //     ctx.response.status = 200;
+  //     break;
+  //   default:
+  //     ctx.response.body = { ok: false };
+  //     ctx.response.status = 500;
+  // }
 });
 
 app.use(router.routes());

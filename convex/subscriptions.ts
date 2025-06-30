@@ -1,7 +1,7 @@
 import { mutation, query } from "./_generated/server.js";
 import { v } from "convex/values";
 
-const Subscription = v.object({
+const PushSubscription = v.object({
 	endpoint: v.string(),
 	expirationTime: v.optional(v.any()),
 	keys: v.object({
@@ -13,7 +13,7 @@ const Subscription = v.object({
 export const post = mutation({
 	args: {
 		user: v.string(),
-		subscription: Subscription,
+		subscription: PushSubscription,
 	},
 	handler: async (ctx, args) => {
 		return await ctx.db.insert("subscriptions", {
@@ -34,7 +34,7 @@ export const get = query({
 export const update = mutation({
 	args: {
 		id: v.id("subscriptions"),
-		subscription: Subscription,
+		subscription: PushSubscription,
 	},
 	handler: async (ctx, args) => {
 		const { id, subscription } = args;

@@ -9,7 +9,7 @@ const convex = new ConvexClient(convexUrl);
 const capitalize = (text: string) =>
   text.charAt(0).toUpperCase() + text.substring(1);
 
-const getNotificationMessage = (
+const getNotificationText = (
   name: string,
   issuer: string,
   eventType: NotificationEvent,
@@ -31,28 +31,35 @@ const getNotificationMessage = (
   }
 };
 
+const getOtherUserName = (user: string) => (user === 'papa' ? 'mama' : 'papa');
+
 export const storeNotificationInDB = async (
   name: string,
   issuer: string,
   eventType: NotificationEvent,
   rate?: string
 ): Promise<Notification> => {
-  const message = getNotificationMessage(name, issuer, eventType, rate);
-  const newNotification = await convex.mutation(api.notifications.post, {
-    name,
+  const text = getNotificationText(name, issuer, eventType, rate);
+  const notification = {
     issuer,
-    message,
+    text,
     eventType,
+    consumptions: [
+      { user: issuer, consumed: true },
+      { user: getOtherUserName(issuer), consumed: false },
+    ],
+  };
+  const storedId = await convex.mutation(api.notifications.post, {
+    notification: notification,
   });
-  console.log({ newNotification });
-  return newNotification;
+const newNotification = {...notification, _id: storedId} 
+ return newNotification;
 };
 
 export const getNotificationFromDB = async (
   id: string
 ): Promise<Notification> => {
   const notification = await convex.query(api.notifications.getById, { id });
-  console.log({ getNotification: notification });
   return notification;
 };
 
@@ -65,6 +72,7 @@ export const isNotificationConsumed = async (
       const retrievedNotification = await getNotificationFromDB(notificationId);
       const storedSubscriptions = await getStoredSubscriptions();
       const otherUser = storedSubscriptions.find((sub) => sub.user !== issuer);
+      if (!otherUser) res(false)
       const consumption = retrievedNotification.consumptions.find(
         (c) => c.user === otherUser?.user
       );

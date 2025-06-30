@@ -10,17 +10,16 @@ const Notification = v.object({
   issuer: v.string(),
   text: v.string(),
   consumptions: v.array(Consumption),
+  eventType: v.string(),
 });
 
 export const post = mutation({
   args: {
-    user: v.string(),
     notification: Notification,
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert('notifications', {
-      user: args.user,
-      notification: args.notification,
+      ...args.notification,
     });
   },
 });

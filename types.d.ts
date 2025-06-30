@@ -2,7 +2,7 @@ import { Id } from './convex/_generated/dataModel.d.ts';
 
 export type PushSubscription = {
   endpoint: string;
-  expirationTime: number | null;
+  expirationTime?: number | null;
   keys: {
     p256dh: string;
     auth: string;
