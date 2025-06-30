@@ -22,11 +22,11 @@ app.use((ctx, next) => {
 
 const router = new Router();
 router.post('/new-subscription', async (ctx) => {
+  console.log('[ROUTE] NEW SUBSCRIPTION');
   try {
     const body = await ctx.request.body.json();
     const subscription: PushSubscription = body.subscription;
     const user: string = body.user;
-    console.log('[ROUTE] NEW SUBSCRIPTION');
     // If user data is not provided, respond with not OK
     if (!subscription?.endpoint || !user) {
       console.log('Missing subscription endpoint or user');
@@ -69,12 +69,14 @@ router.post('/new-subscription', async (ctx) => {
 });
 
 router.get('/public-vapid-key', (ctx) => {
+  console.log('[ROUTE] PUBLIC VAPID KEY');
   ctx.response.status = 200;
   ctx.response.body = { publicVapidKey, ok: true };
 });
 
 router.post('/send-notification', async (ctx) => {
   try {
+    console.log('[ROUTE] SEND NOTIFICATION');
     const body = await ctx.request.body.json();
     const name = body.name as string;
     const user = body.user as string;
@@ -90,7 +92,6 @@ router.post('/send-notification', async (ctx) => {
     handleNewNotification(name, user, eventType, rate);
     ctx.response.body = { ok: true };
     ctx.response.status = 200;
-
   } catch (e) {
     console.error('General error in route send-notification', e);
   }

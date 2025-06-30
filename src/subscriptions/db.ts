@@ -19,9 +19,7 @@ export const getUserSubscription = async (
   user: string
 ): Promise<Subscription | undefined> => {
   try {
-    console.log('IN GET USER SUBSCRIPTION')
     const subscriptions = await getStoredSubscriptions();
-    console.log({subscriptions, user})
     const userSubscription = subscriptions?.find((sub) => sub.user === user);
     return userSubscription;
   } catch (e) {
