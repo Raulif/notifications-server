@@ -67,72 +67,76 @@ router.get('/public-vapid-key', (ctx) => {
 });
 
 router.post('/send-notification', async (ctx) => {
-  const body = await ctx.request.body.json();
-  const name = body.name as string;
-  const user = body.user as string;
-  const eventType = body.eventType as NotificationEvent;
-  const rate = body.rate;
+  try {
+    const body = await ctx.request.body.json();
+    const name = body.name as string;
+    const user = body.user as string;
+    const eventType = body.eventType as NotificationEvent;
+    const rate = body.rate;
 
-  if (!eventType || !user || (eventType === 'rate' && !rate)) {
-    ctx.response.status = 418;
-    ctx.response.body = { ok: false };
-    return;
-  }
-  console.log({ name, user, eventType, rate });
-
-  switch (eventType) {
-    case 'new':
-      handleNewNameNotification(name, user);
-      ctx.response.body = { ok: true };
-      ctx.response.status = 200;
-      return;
-    default:
+    if (!eventType || !user || (eventType === 'rate' && !rate)) {
+      ctx.response.status = 418;
       ctx.response.body = { ok: false };
-      ctx.response.status = 500;
+      return;
+    }
+    console.log({ name, user, eventType, rate });
+
+    switch (eventType) {
+      case 'new':
+        handleNewNameNotification(name, user);
+        ctx.response.body = { ok: true };
+        ctx.response.status = 200;
+        return;
+      default:
+        ctx.response.body = { ok: false };
+        ctx.response.status = 500;
+    }
+
+    // const storedSubscriptions = ((await convex.query(
+    //   api.subscriptions.get,
+    //   {}
+    // )) || []) as Array<Subscription>;
+
+    // const otherUser = storedSubscriptions.find((sub) => sub.user !== user);
+    // if (!otherUser) {
+    //   ctx.response.status = 200;
+    //   ctx.response.body = { ok: true };
+    //   return;
+    // }
+    // const subscription = otherUser.subscription;
+    // switch (eventType) {
+    //   case 'new':
+    //     sendNewNameNotification(name, subscription, user);
+    //     ctx.response.body = { ok: true };
+    //     ctx.response.status = 200;
+    //     break;
+    //   case 'delete':
+    //     sendDeleteNameNotification(name, subscription, user);
+    //     ctx.response.body = { ok: true };
+    //     ctx.response.status = 200;
+    //     break;
+    //   case 'rate':
+    //     sendRateNotification(name, subscription, user, rate);
+    //     ctx.response.body = { ok: true };
+    //     ctx.response.status = 200;
+    //     break;
+    //   case 'veto':
+    //     sendVetoNotification(name, subscription, user);
+    //     ctx.response.body = { ok: true };
+    //     ctx.response.status = 200;
+    //     break;
+    //   case 'unveto':
+    //     sendUnvetoNotification(name, subscription, user);
+    //     ctx.response.body = { ok: true };
+    //     ctx.response.status = 200;
+    //     break;
+    //   default:
+    //     ctx.response.body = { ok: false };
+    //     ctx.response.status = 500;
+    // }
+  } catch (e) {
+    console.error('General error in route send-notification', e);
   }
-
-  // const storedSubscriptions = ((await convex.query(
-  //   api.subscriptions.get,
-  //   {}
-  // )) || []) as Array<Subscription>;
-
-  // const otherUser = storedSubscriptions.find((sub) => sub.user !== user);
-  // if (!otherUser) {
-  //   ctx.response.status = 200;
-  //   ctx.response.body = { ok: true };
-  //   return;
-  // }
-  // const subscription = otherUser.subscription;
-  // switch (eventType) {
-  //   case 'new':
-  //     sendNewNameNotification(name, subscription, user);
-  //     ctx.response.body = { ok: true };
-  //     ctx.response.status = 200;
-  //     break;
-  //   case 'delete':
-  //     sendDeleteNameNotification(name, subscription, user);
-  //     ctx.response.body = { ok: true };
-  //     ctx.response.status = 200;
-  //     break;
-  //   case 'rate':
-  //     sendRateNotification(name, subscription, user, rate);
-  //     ctx.response.body = { ok: true };
-  //     ctx.response.status = 200;
-  //     break;
-  //   case 'veto':
-  //     sendVetoNotification(name, subscription, user);
-  //     ctx.response.body = { ok: true };
-  //     ctx.response.status = 200;
-  //     break;
-  //   case 'unveto':
-  //     sendUnvetoNotification(name, subscription, user);
-  //     ctx.response.body = { ok: true };
-  //     ctx.response.status = 200;
-  //     break;
-  //   default:
-  //     ctx.response.body = { ok: false };
-  //     ctx.response.status = 500;
-  // }
 });
 
 app.use(router.routes());
