@@ -11,6 +11,14 @@ export const getOtherUserSubscription = async (
   user: string
 ): Promise<Subscription | undefined> => {
   const subscriptions = await getStoredSubscriptions();
-  const userSubscription = subscriptions?.find((u) => u.user !== user);
+  const otherUserSubscription = subscriptions?.find((sub) => sub.user !== user);
+  return otherUserSubscription;
+};
+
+export const getUserSubscription = async (
+  user: string
+): Promise<Subscription | undefined> => {
+  const subscriptions = await getStoredSubscriptions();
+  const userSubscription = subscriptions?.find((sub) => sub.user === user);
   return userSubscription;
 };

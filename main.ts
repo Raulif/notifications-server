@@ -5,7 +5,7 @@ import { ConvexClient } from 'npm:convex/browser';
 import { api } from './convex/_generated/api.js';
 
 import type { NotificationEvent, PushSubscription } from './types.d.ts';
-import { getOtherUserSubscription } from './src/subscriptions/db.ts';
+import { getUserSubscription } from './src/subscriptions/db.ts';
 import { handleNewNameNotification } from './src/notifications/new-name.ts';
 import { setUpNotificationServerCredentials } from './src/notifications/webpush-server.ts';
 
@@ -32,8 +32,11 @@ router.post('/new-subscription', async (ctx) => {
       ctx.response.body = { ok: false };
     } else {
       // Get existing users
-      const userSubscription = await getOtherUserSubscription(user);
-      if (userSubscription) {
+      const userSubscription = await getUserSubscription(user);
+      if (
+        userSubscription &&
+        userSubscription.subscription.endpoint !== subscription.endpoint
+      ) {
         // If user exist, update user subscription in DB
         await convex.mutation(api.subscriptions.update, {
           id: userSubscription._id,
@@ -52,6 +55,7 @@ router.post('/new-subscription', async (ctx) => {
     }
   } catch (e) {
     // Respond with error
+    console.error("ERROR IN NEW SUBSCRIPTION")
     console.error(e);
     ctx.response.status = 500;
     ctx.response.body = { ok: false };
@@ -138,11 +142,11 @@ router.post('/send-notification', async (ctx) => {
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-app.addEventListener("listen", ({ hostname, port, secure }) => {
+app.addEventListener('listen', ({ hostname, port, secure }) => {
   console.log(
-    `Listening on: ${secure ? "https://" : "http://"}${
-      hostname ?? "localhost"
-    }:${port}`,
+    `Listening on: ${secure ? 'https://' : 'http://'}${
+      hostname ?? 'localhost'
+    }:${port}`
   );
 });
 
