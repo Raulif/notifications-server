@@ -18,7 +18,15 @@ export const getOtherUserSubscription = async (
 export const getUserSubscription = async (
   user: string
 ): Promise<Subscription | undefined> => {
-  const subscriptions = await getStoredSubscriptions();
-  const userSubscription = subscriptions?.find((sub) => sub.user === user);
-  return userSubscription;
+  try {
+    console.log('IN GET USER SUBSCRIPTION')
+    const subscriptions = await getStoredSubscriptions();
+    console.log({subscriptions, user})
+    const userSubscription = subscriptions?.find((sub) => sub.user === user);
+    return userSubscription;
+  } catch (e) {
+    console.error('ERROR IN GET USER SUBSCRIPTION');
+    console.error(e);
+    return;
+  }
 };
