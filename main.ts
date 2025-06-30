@@ -26,6 +26,9 @@ router.post('/new-subscription', async (ctx) => {
     const body = await ctx.request.body.json();
     const subscription: PushSubscription = body.subscription;
     const user: string = body.user;
+    console.log('[ROUTE] NEW SUBSCRIPTION')
+    console.log({subscription})
+    console.log({user})
     // If user data is not provided, respond with not OK
     if (!subscription?.endpoint || !user) {
       ctx.response.status = 418;
@@ -33,21 +36,26 @@ router.post('/new-subscription', async (ctx) => {
     } else {
       // Get existing users
       const userSubscription = await getUserSubscription(user);
+      console.log('User subscription found')
+      console.log({userSubscription})
       if (
         userSubscription &&
         userSubscription.subscription.endpoint !== subscription.endpoint
       ) {
+        console.log('Endpoint is different. Updating subscription.')
         // If user exist, update user subscription in DB
-        await convex.mutation(api.subscriptions.update, {
+        const updatedSubscription = await convex.mutation(api.subscriptions.update, {
           id: userSubscription._id,
           subscription,
         });
+        console.log({updatedSubscription})
       } else {
         // If user does not exist, store new in DB
-        await convex.mutation(api.subscriptions.post, {
+        const newSubscription = await convex.mutation(api.subscriptions.post, {
           user,
           subscription,
         });
+        console.log({newSubscription})
       }
       // Respond with OK
       ctx.response.status = 200;
