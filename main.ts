@@ -6,7 +6,7 @@ import { api } from './convex/_generated/api.js';
 
 import type { NotificationEvent, PushSubscription } from './types.d.ts';
 import { getUserSubscription } from './src/subscriptions/db.ts';
-import { handleNewNameNotification } from './src/notifications/new-name.ts';
+import { handleNewNotification } from './src/notifications/notifications.ts';
 import { setUpNotificationServerCredentials } from './src/notifications/webpush-server.ts';
 
 setUpNotificationServerCredentials();
@@ -27,11 +27,9 @@ router.post('/new-subscription', async (ctx) => {
     const subscription: PushSubscription = body.subscription;
     const user: string = body.user;
     console.log('[ROUTE] NEW SUBSCRIPTION');
-    console.log({ subscription });
-    console.log({ user });
     // If user data is not provided, respond with not OK
     if (!subscription?.endpoint || !user) {
-      console.log('Missing subscription endpoint or user')
+      console.log('Missing subscription endpoint or user');
       ctx.response.status = 418;
       ctx.response.body = { ok: false };
     } else {
@@ -39,28 +37,23 @@ router.post('/new-subscription', async (ctx) => {
       // Get existing users
       const userSubscription = await getUserSubscription(user);
       console.log('User subscription found');
-      console.log({ userSubscription });
       if (
         !!userSubscription?.subscription &&
         userSubscription.subscription.endpoint !== subscription.endpoint
       ) {
         console.log('Endpoint is different. Updating subscription.');
         // If user exist, update user subscription in DB
-        const updatedSubscription = await convex.mutation(
-          api.subscriptions.update,
-          {
-            id: userSubscription._id,
-            subscription,
-          }
-        );
-        console.log({ updatedSubscription });
+        await convex.mutation(api.subscriptions.update, {
+          id: userSubscription._id,
+          subscription,
+        });
       } else {
         // If user does not exist, store new in DB
-        const newSubscription = await convex.mutation(api.subscriptions.post, {
+        console.log('Storing new subscription');
+        await convex.mutation(api.subscriptions.post, {
           user,
           subscription,
         });
-        console.log({ newSubscription });
       }
       // Respond with OK
       ctx.response.status = 200;
@@ -94,59 +87,10 @@ router.post('/send-notification', async (ctx) => {
       return;
     }
 
-    switch (eventType) {
-      case 'new':
-        handleNewNameNotification(name, user);
-        ctx.response.body = { ok: true };
-        ctx.response.status = 200;
-        return;
-      default:
-        ctx.response.body = { ok: false };
-        ctx.response.status = 500;
-    }
+    handleNewNotification(name, user, eventType);
+    ctx.response.body = { ok: true };
+    ctx.response.status = 200;
 
-    // const storedSubscriptions = ((await convex.query(
-    //   api.subscriptions.get,
-    //   {}
-    // )) || []) as Array<Subscription>;
-
-    // const otherUser = storedSubscriptions.find((sub) => sub.user !== user);
-    // if (!otherUser) {
-    //   ctx.response.status = 200;
-    //   ctx.response.body = { ok: true };
-    //   return;
-    // }
-    // const subscription = otherUser.subscription;
-    // switch (eventType) {
-    //   case 'new':
-    //     sendNewNameNotification(name, subscription, user);
-    //     ctx.response.body = { ok: true };
-    //     ctx.response.status = 200;
-    //     break;
-    //   case 'delete':
-    //     sendDeleteNameNotification(name, subscription, user);
-    //     ctx.response.body = { ok: true };
-    //     ctx.response.status = 200;
-    //     break;
-    //   case 'rate':
-    //     sendRateNotification(name, subscription, user, rate);
-    //     ctx.response.body = { ok: true };
-    //     ctx.response.status = 200;
-    //     break;
-    //   case 'veto':
-    //     sendVetoNotification(name, subscription, user);
-    //     ctx.response.body = { ok: true };
-    //     ctx.response.status = 200;
-    //     break;
-    //   case 'unveto':
-    //     sendUnvetoNotification(name, subscription, user);
-    //     ctx.response.body = { ok: true };
-    //     ctx.response.status = 200;
-    //     break;
-    //   default:
-    //     ctx.response.body = { ok: false };
-    //     ctx.response.status = 500;
-    // }
   } catch (e) {
     console.error('General error in route send-notification', e);
   }

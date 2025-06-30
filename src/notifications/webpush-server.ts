@@ -13,8 +13,5 @@ export const sendPushNotification = (
   subscription: PushSubscription,
   message: string
 ) => {
-  console.log('SEND PUSH NOTIFICATION');
-  console.log(subscription.endpoint);
-  console.log(message);
   webpush.sendNotification(subscription, message);
 };
