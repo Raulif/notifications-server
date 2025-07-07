@@ -24,7 +24,7 @@ app.use((ctx, next) => {
 });
 
 const router = new Router();
-router.post('/new-subscription', async (ctx) => {
+router.post('/subscription', async (ctx) => {
   console.log('[ROUTE] POST NEW SUBSCRIPTION');
   try {
     const body = await ctx.request.body.json();
