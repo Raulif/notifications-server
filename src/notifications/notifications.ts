@@ -24,9 +24,7 @@ export const handleNewNotification = async (
     const otherUserSubscription = await getOtherUserSubscription(issuer);
     if (!otherUserSubscription) return;
     const notificationData = {
-      message: newNotification.text,
-      user: issuer,
-      id: newNotification._id,
+      notification: newNotification,
     };
     sendPushNotification(
       otherUserSubscription?.subscription,
