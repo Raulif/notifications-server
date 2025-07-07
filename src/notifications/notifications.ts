@@ -1,6 +1,5 @@
 import type { NotificationEvent } from '../../types.d.ts';
 import { getOtherUserSubscription } from '../subscriptions/db.ts';
-import { isNotificationConsumed } from './helpers.ts';
 import { storeNotificationInDB, updateNotificationConsumption } from './db.ts';
 import { sendPushNotification } from './webpush-server.ts';
 
@@ -17,20 +16,15 @@ export const handleNewNotification = async (
     eventType,
     rate
   );
-  // Delayed check if notification has already been consumed
-  const isConsumed = await isNotificationConsumed(newNotification._id, issuer);
-  // If not consumed, send push notification
-  if (!isConsumed) {
-    const otherUserSubscription = await getOtherUserSubscription(issuer);
-    if (!otherUserSubscription) return;
-    const notificationData = {
-      notification: newNotification,
-    };
-    sendPushNotification(
-      otherUserSubscription?.subscription,
-      JSON.stringify(notificationData)
-    );
-  }
+  const otherUserSubscription = await getOtherUserSubscription(issuer);
+  if (!otherUserSubscription?.subscription) return;
+  const notificationData = {
+    notification: newNotification,
+  };
+  sendPushNotification(
+    otherUserSubscription?.subscription,
+    JSON.stringify(notificationData)
+  );
 };
 
 export const handleUpdateNotification = async (id: string, user: string) => {
