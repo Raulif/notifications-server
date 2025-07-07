@@ -11,20 +11,30 @@ export const handleNewNotification = async (
   rate?: string
 ) => {
   // Save notification to DB
-  const newNotification = await storeNotificationInDB(name, issuer, eventType, rate);
+  const newNotification = await storeNotificationInDB(
+    name,
+    issuer,
+    eventType,
+    rate
+  );
   // Delayed check if notification has already been consumed
   const isConsumed = await isNotificationConsumed(newNotification._id, issuer);
   // If not consumed, send push notification
   if (!isConsumed) {
     const otherUserSubscription = await getOtherUserSubscription(issuer);
     if (!otherUserSubscription) return;
+    const notificationData = {
+      message: newNotification.text,
+      user: issuer,
+      id: newNotification._id,
+    };
     sendPushNotification(
       otherUserSubscription?.subscription,
-      newNotification.text
+      JSON.stringify(notificationData)
     );
   }
 };
 
 export const handleUpdateNotification = async (id: string, user: string) => {
-  return await updateNotificationConsumption(id, user)
-}
+  return await updateNotificationConsumption(id, user);
+};

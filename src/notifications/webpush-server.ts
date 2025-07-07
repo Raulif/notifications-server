@@ -11,7 +11,7 @@ export const setUpNotificationServerCredentials = () => {
 
 export const sendPushNotification = (
   subscription: PushSubscription,
-  message: string
+  data: string
 ) => {
-  webpush.sendNotification(subscription, message);
+  webpush.sendNotification(subscription, data);
 };
