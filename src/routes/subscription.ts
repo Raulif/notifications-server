@@ -40,6 +40,7 @@ export const addSubscription = async (
           subscription,
         });
       }
+      console.log({userSubscription, subscription})
       if (
         !!userSubscription?.subscription &&
         userSubscription.subscription.endpoint !== subscription.endpoint
