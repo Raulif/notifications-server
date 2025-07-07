@@ -30,26 +30,32 @@ export const addSubscription = async (
       console.log('Getting User Subscription');
       // Get existing users
       const userSubscription = await getUserSubscription(user);
+      if (!userSubscription) {
+        console.log('No user subscription found');
+        // If user does not exist, store new in DB
+        console.log('Storing new subscription');
+        console.log({ subscription });
+        await convex.mutation(api.subscriptions.post, {
+          user,
+          subscription,
+        });
+      }
       if (
         !!userSubscription?.subscription &&
         userSubscription.subscription.endpoint !== subscription.endpoint
       ) {
         console.log('User subscription found');
-        console.log({userSubscription})
+        console.log({ userSubscription });
         console.log('Endpoint is different. Updating subscription.');
         // If user exist, update user subscription in DB
         await convex.mutation(api.subscriptions.update, {
           id: userSubscription._id,
           subscription,
         });
-      } else if (!userSubscription) {
-        console.log('No user subscription found')
-        // If user does not exist, store new in DB
-        console.log('Storing new subscription');
-        await convex.mutation(api.subscriptions.post, {
-          user,
-          subscription,
-        });
+      } else {
+        console.log(
+          'User subscription found as is the same as the stored one. Skipping update to DB.'
+        );
       }
       // Respond with OK
       ctx.response.status = 200;
