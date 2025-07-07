@@ -7,10 +7,10 @@ const Consumption = v.object({
 });
 
 const Notification = v.object({
-  issuer: v.string(),
-  text: v.string(),
-  consumptions: v.array(Consumption),
-  eventType: v.string(),
+  issuer: v.optional(v.string()),
+  text: v.optional(v.string()),
+  consumptions: v.optional(v.array(Consumption)),
+  eventType: v.optional(v.string()),
   _creationTime: v.optional(v.any()),
   _id: v.optional(v.id('notifications'))
 });

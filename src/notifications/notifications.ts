@@ -1,7 +1,7 @@
 import type { NotificationEvent } from '../../types.d.ts';
 import { getOtherUserSubscription } from '../subscriptions/db.ts';
 import { isNotificationConsumed } from './helpers.ts';
-import { storeNotificationInDB } from './db.ts';
+import { storeNotificationInDB, updateNotificationConsumption } from './db.ts';
 import { sendPushNotification } from './webpush-server.ts';
 
 export const handleNewNotification = async (
@@ -12,7 +12,7 @@ export const handleNewNotification = async (
 ) => {
   // Save notification to DB
   const newNotification = await storeNotificationInDB(name, issuer, eventType, rate);
-  // 1Delayed check if notification has already been consumed
+  // Delayed check if notification has already been consumed
   const isConsumed = await isNotificationConsumed(newNotification._id, issuer);
   // If not consumed, send push notification
   if (!isConsumed) {
@@ -24,3 +24,7 @@ export const handleNewNotification = async (
     );
   }
 };
+
+export const handleUpdateNotification = async (id: string, user: string) => {
+  return await updateNotificationConsumption(id, user)
+}

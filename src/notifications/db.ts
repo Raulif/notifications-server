@@ -1,8 +1,8 @@
 import { ConvexClient } from 'npm:convex/browser';
 import { api } from '../../convex/_generated/api.js';
-import { Notification, NotificationEvent } from "../../types.d.ts";
-import { getNotificationText } from "./helpers.ts";
-import { getOtherUserName } from "../helpers.ts";
+import { Notification, NotificationEvent } from '../../types.d.ts';
+import { getNotificationText } from './helpers.ts';
+import { getOtherUserName } from '../helpers.ts';
 
 const convexUrl = Deno.env.get('CONVEX_URL') as string;
 const convex = new ConvexClient(convexUrl);
@@ -35,4 +35,30 @@ export const storeNotificationInDB = async (
   });
   const newNotification = { ...notification, _id: storedId };
   return newNotification;
+};
+
+export const updateNotificationConsumption = async (
+  id: string,
+  user: string
+) => {
+  try {
+    const notification: Notification = await convex.query(
+      api.notifications.getById,
+      { id }
+    );
+    if (!notification) return false;
+    const consumptionIndex = notification.consumptions.findIndex(
+      (con) => con.user === user
+    );
+    if (consumptionIndex === -1) return false;
+    notification.consumptions[consumptionIndex].consumed = true;
+    await convex.mutation(api.notifications.update, {
+      id,
+      notification,
+    });
+    return true;
+  } catch (e) {
+    console.error('Error updating notification');
+    console.error(e);
+  }
 };

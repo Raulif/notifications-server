@@ -6,7 +6,10 @@ import { api } from './convex/_generated/api.js';
 
 import type { NotificationEvent, PushSubscription } from './types.d.ts';
 import { getUserSubscription } from './src/subscriptions/db.ts';
-import { handleNewNotification } from './src/notifications/notifications.ts';
+import {
+  handleNewNotification,
+  handleUpdateNotification,
+} from './src/notifications/notifications.ts';
 import { setUpNotificationServerCredentials } from './src/notifications/webpush-server.ts';
 
 setUpNotificationServerCredentials();
@@ -22,7 +25,7 @@ app.use((ctx, next) => {
 
 const router = new Router();
 router.post('/new-subscription', async (ctx) => {
-  console.log('[ROUTE] NEW SUBSCRIPTION');
+  console.log('[ROUTE] POST NEW SUBSCRIPTION');
   try {
     const body = await ctx.request.body.json();
     const subscription: PushSubscription = body.subscription;
@@ -59,6 +62,7 @@ router.post('/new-subscription', async (ctx) => {
       ctx.response.status = 200;
       ctx.response.body = { ok: true };
     }
+    return;
   } catch (e) {
     // Respond with error
     console.error('ERROR IN NEW SUBSCRIPTION');
@@ -69,14 +73,15 @@ router.post('/new-subscription', async (ctx) => {
 });
 
 router.get('/public-vapid-key', (ctx) => {
-  console.log('[ROUTE] PUBLIC VAPID KEY');
+  console.log('[ROUTE] GET PUBLIC VAPID KEY');
   ctx.response.status = 200;
   ctx.response.body = { publicVapidKey, ok: true };
+  return;
 });
 
-router.post('/send-notification', async (ctx) => {
+router.post('/notification', async (ctx) => {
   try {
-    console.log('[ROUTE] SEND NOTIFICATION');
+    console.log('[ROUTE] POST NOTIFICATION');
     const body = await ctx.request.body.json();
     const name = body.name as string;
     const user = body.user as string;
@@ -92,9 +97,31 @@ router.post('/send-notification', async (ctx) => {
     handleNewNotification(name, user, eventType, rate);
     ctx.response.body = { ok: true };
     ctx.response.status = 200;
+    return;
   } catch (e) {
     console.error('General error in route send-notification', e);
   }
+});
+
+router.patch('/notification', async (ctx) => {
+  console.log('[ROUTE] PATCH NOTIFICATION');
+  const params = ctx.request.url.searchParams;
+  const id = params.get('id') as string;
+  const user = params.get('user') as string;
+  if (!id || !user) {
+    ctx.response.status = 404;
+    ctx.response.body = { ok: false };
+    return;
+  }
+  const updated = await handleUpdateNotification(id, user);
+  if (!updated) {
+    ctx.response.status = 500;
+    ctx.response.body = { ok: false };
+    return;
+  }
+  ctx.response.body = { ok: true };
+  ctx.response.status = 200;
+  return;
 });
 
 app.use(router.routes());
