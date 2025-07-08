@@ -67,9 +67,9 @@ export const updateNotification = async (
 ) => {
   setCors(ctx, next, 'notification');
   console.log('[ROUTE] PATCH NOTIFICATION');
-  const params = ctx.request.url.searchParams;
-  const id = params.get('id') as string;
-  const user = params.get('user') as string;
+  const body = await ctx.request.body.json();
+  const id = body.id as string;
+  const user = body.user as string;
 
   if (!id || !user) {
     ctx.response.status = 404;
@@ -83,7 +83,7 @@ export const updateNotification = async (
     ctx.response.body = { ok: false };
     return;
   }
-  
+
   ctx.response.body = { ok: true };
   ctx.response.status = 200;
   return;
