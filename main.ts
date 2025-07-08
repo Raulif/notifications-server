@@ -24,7 +24,7 @@ router.post('/subscription', addSubscription);
 // Notification routes
 router.get('/notification/public-vapid-key', getPublicVapidKey);
 router.post('/notification', addNotification);
-router.patch('/notification', updateNotification);
+router.put('/notification', updateNotification);
 
 app.use(router.routes());
 app.use(router.allowedMethods());

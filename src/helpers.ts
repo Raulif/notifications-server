@@ -4,7 +4,7 @@ export const getOtherUserName = (user: string) =>
   user === 'papa' ? 'mama' : 'papa';
 
 const routeNameToMethodsMap: Record<string, Array<string>> = {
-  notification: ['GET', 'POST', 'PATCH', 'OPTIONS'],
+  notification: ['GET', 'POST', 'PUT', 'OPTIONS'],
   subscription: ['POST', 'OPTIONS'],
 };
 
