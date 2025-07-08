@@ -14,6 +14,7 @@ export const getOtherUserSubscription = async (
   const otherUser = getOtherUserName(user)
   const subscriptions = await getStoredSubscriptions();
   const otherUserSubscription = subscriptions?.find((sub) => sub.user === otherUser);
+  console.log({otherUserSubscription, otherUser})
   return otherUserSubscription;
 };
 

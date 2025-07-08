@@ -18,12 +18,12 @@ export const handleNewNotification = async (
   );
   const otherUserSubscription = await getOtherUserSubscription(issuer);
   if (!otherUserSubscription?.subscription) return;
-  const notificationData = {
+  const data = {
     notification: newNotification,
   };
   sendPushNotification(
     otherUserSubscription?.subscription,
-    JSON.stringify(notificationData)
+    JSON.stringify(data)
   );
 };
 

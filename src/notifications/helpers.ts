@@ -2,7 +2,6 @@ import { NotificationEvent } from '../../types.d.ts';
 
 import { capitalize } from '../helpers.ts';
 
-
 export const getNotificationText = (
   name: string,
   issuer: string,

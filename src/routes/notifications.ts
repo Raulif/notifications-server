@@ -42,7 +42,7 @@ export const addNotification = async (
       return;
     }
 
-    handleNewNotification(name, user, eventType, rate);
+    await handleNewNotification(name, user, eventType, rate);
     ctx.response.body = { ok: true };
     ctx.response.status = 200;
     return;
