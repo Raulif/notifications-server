@@ -4,6 +4,7 @@ import { ConvexClient } from 'npm:convex/browser';
 import { getUserSubscription } from '../subscriptions/db.ts';
 import type { PushSubscription } from '../../types.d.ts';
 import { api } from '../../convex/_generated/api.js';
+import { setCors } from "../helpers.ts";
 
 const convexUrl = Deno.env.get('CONVEX_URL') as string;
 const convex = new ConvexClient(convexUrl);
@@ -14,8 +15,9 @@ export const addSubscription = async (
     Record<string | number, string | undefined>,
     // deno-lint-ignore no-explicit-any
     Record<string, any>
-  >
+  >,next: () => Promise<unknown>
 ) => {
+  setCors(ctx, next, 'subscription')
   console.log('[ROUTE] POST NEW SUBSCRIPTION');
   try {
     const body = await ctx.request.body.json();

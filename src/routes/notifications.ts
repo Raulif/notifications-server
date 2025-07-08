@@ -4,6 +4,7 @@ import {
   handleNewNotification,
   handleUpdateNotification,
 } from '../notifications/notifications.ts';
+import { setCors } from '../helpers.ts';
 const publicVapidKey = Deno.env.get('PUBLIC_VAPID_KEY') as string;
 
 export const getPublicVapidKey = (
@@ -12,8 +13,10 @@ export const getPublicVapidKey = (
     Record<string | number, string | undefined>,
     // deno-lint-ignore no-explicit-any
     Record<string, any>
-  >
+  >,
+  next: () => Promise<unknown>
 ) => {
+  setCors(ctx, next, 'notification');
   console.log('[ROUTE] GET PUBLIC VAPID KEY');
   ctx.response.status = 200;
   ctx.response.body = { publicVapidKey, ok: true };
@@ -26,8 +29,10 @@ export const addNotification = async (
     Record<string | number, string | undefined>,
     // deno-lint-ignore no-explicit-any
     Record<string, any>
-  >
+  >,
+  next: () => Promise<unknown>
 ) => {
+  setCors(ctx, next, 'notification');
   try {
     console.log('[ROUTE] POST NOTIFICATION');
     const body = await ctx.request.body.json();
@@ -57,23 +62,28 @@ export const updateNotification = async (
     Record<string | number, string | undefined>,
     // deno-lint-ignore no-explicit-any
     Record<string, any>
-  >
+  >,
+  next: () => Promise<unknown>
 ) => {
+  setCors(ctx, next, 'notification');
   console.log('[ROUTE] PATCH NOTIFICATION');
   const params = ctx.request.url.searchParams;
   const id = params.get('id') as string;
   const user = params.get('user') as string;
+
   if (!id || !user) {
     ctx.response.status = 404;
     ctx.response.body = { ok: false };
     return;
   }
+
   const updated = await handleUpdateNotification(id, user);
   if (!updated) {
     ctx.response.status = 500;
     ctx.response.body = { ok: false };
     return;
   }
+  
   ctx.response.body = { ok: true };
   ctx.response.status = 200;
   return;
