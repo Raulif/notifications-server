@@ -4,7 +4,6 @@ import {
   handleNewNotification,
   handleUpdateNotification,
 } from '../notifications/notifications.ts';
-import { setCors } from '../helpers.ts';
 const publicVapidKey = Deno.env.get('PUBLIC_VAPID_KEY') as string;
 
 export const getPublicVapidKey = (
@@ -13,10 +12,8 @@ export const getPublicVapidKey = (
     Record<string | number, string | undefined>,
     // deno-lint-ignore no-explicit-any
     Record<string, any>
-  >,
-  next: () => Promise<unknown>
+  >
 ) => {
-  setCors(ctx, next, 'notification');
   console.log('[ROUTE] GET PUBLIC VAPID KEY');
   ctx.response.status = 200;
   ctx.response.body = { publicVapidKey, ok: true };
@@ -27,12 +24,9 @@ export const addNotification = async (
   ctx: RouterContext<
     '/notification',
     Record<string | number, string | undefined>,
-    // deno-lint-ignore no-explicit-any
     Record<string, any>
-  >,
-  next: () => Promise<unknown>
+  >
 ) => {
-  setCors(ctx, next, 'notification');
   try {
     console.log('[ROUTE] POST NOTIFICATION');
     const body = await ctx.request.body.json();
@@ -58,14 +52,12 @@ export const addNotification = async (
 
 export const updateNotification = async (
   ctx: RouterContext<
-    '/notification',
+    '/notification/update',
     Record<string | number, string | undefined>,
     // deno-lint-ignore no-explicit-any
     Record<string, any>
   >,
-  next: () => Promise<unknown>
 ) => {
-  setCors(ctx, next, 'notification');
   console.log('[ROUTE] PATCH NOTIFICATION');
   const body = await ctx.request.body.json();
   const id = body.id as string;

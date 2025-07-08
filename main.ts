@@ -22,9 +22,9 @@ const router = new Router();
 router.post('/subscription', addSubscription);
 
 // Notification routes
-router.get('/notification/public-vapid-key', getPublicVapidKey);
 router.post('/notification', addNotification);
-router.put('/notification', updateNotification);
+router.post('/notification/update', updateNotification);
+router.get('/notification/public-vapid-key', getPublicVapidKey);
 
 app.use(router.routes());
 app.use(router.allowedMethods());
